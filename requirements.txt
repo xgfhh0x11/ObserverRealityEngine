@@ -1,0 +1,6 @@
+# ObserverRealityEngine — pure Python (standard library only).
+# There are NO runtime dependencies, so this file is intentionally empty.
+#
+# To run the test suite, install the dev/test dependencies instead:
+#     pip install -r tests/requirements.txt   # pytest
+
