@@ -58,7 +58,14 @@ class ISA:
     def state_store(self, result_set: str):
         """
         STATE.STORE: Store collapsed result as DIRAC delta.
-        
+
+        Deprecated and disabled -- forwards to
+        StateManager.store_result(), which now raises
+        NotImplementedError because it conflates a SET identifier with
+        a micro-state name (see its docstring). Use the high-level
+        Engine.collapse() (which calls store_micro_states() with the
+        correctly resolved micro-states) instead of this ISA op.
+
         Args:
             result_set: Selected SET identifier
         """
@@ -184,6 +191,14 @@ class ISA:
         """
         INVALIDATE.QS: Invalidate all questions in active MW.
         (Actually handled by collapse, but kept for ISA completeness)
+
+        Dead code in this codebase: Engine.collapse() already
+        invalidates every active Q atomically, so nothing here ever
+        calls this method, and execute_program() has no 'INVALIDATE.QS'
+        case in its op dispatch (unlike 'MW.END', which is wired and
+        genuinely reachable as a no-op). Kept as a direct, callable ISA
+        op for programs that want to invalidate a window's Qs without
+        going through collapse().
         """
         if self.engine.active_mw:
             for q in self.engine.active_mw.get_active_questions():

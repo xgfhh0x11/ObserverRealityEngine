@@ -239,16 +239,27 @@ class Engine:
         3. Project
         4. Collapse
         5. Return result
-        
+
         Convenience method for full cycle.
+
+        Raises:
+            ValueError: if any question in `questions` is already
+                invalidated (register_question() returns False in that
+                case). Proceeding silently would collapse a smaller
+                window than the caller requested with no signal that a
+                question was dropped.
         """
         mw = self.open_measurement_window()
-        
+
         for q in questions:
-            self.register_question(q)
-        
+            if not self.register_question(q):
+                raise ValueError(
+                    f"question {q.id} is already invalidated and cannot "
+                    "be registered for a new measurement cycle"
+                )
+
         self.project_all()
         result = self.collapse()
-        
+
         return result
 

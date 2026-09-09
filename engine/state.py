@@ -107,9 +107,25 @@ class StateManager:
     def store_result(self, result_set: str):
         """
         STATE.STORE: Store collapsed result as DIRAC delta.
-        (Deprecated: use store_micro_states instead)
+
+        Deprecated and disabled. This conflates a SET identifier (a
+        partition label such as "E1") with a micro-state name: it
+        writes omega_global = {result_set} directly, which is only
+        correct by coincidence when the SET id happens to equal one of
+        the actual surviving micro-states. Resolving a SET id back to
+        its real micro-states requires the originating Question's
+        partition, which this method has no access to, so it cannot be
+        fixed in place. Use store_micro_states() with the actual
+        surviving micro-states instead -- Engine.collapse() already
+        does this for the high-level API.
         """
-        self.state = self.state.to_dirac(result_set)
+        raise NotImplementedError(
+            "StateManager.store_result() is deprecated and disabled: it "
+            "conflates a SET identifier with a micro-state name and can "
+            "silently corrupt post-collapse state. Use "
+            "store_micro_states(micro_states) with the resolved "
+            "surviving micro-states instead."
+        )
     
     def store_micro_states(self, micro_states: Set[str]):
         """

@@ -1,9 +1,7 @@
 # Observer-Defined Reality Engine — Build & Verification
 
-> *Quality gate for the HBO NL portfolio. This file answers:
+> *Quality gate for this project. This file answers:
 > "Is this project buildable, runnable, and behaving as documented?"*
-
-> *Last updated: 2026-05-14 — post P0–P3 fix pass.*
 
 ## 1. Build
 
@@ -11,7 +9,7 @@
 
 - **Platform**: Python 3.10, 3.11, or 3.12 (CI matrix in `.github/workflows/python-tests.yml`). Locally verified on Python 3.14 — passes.
 - **Toolchain**: `pip` + `venv` (no compiled extensions, no setup.py, no pyproject.toml). The project is run "in place" from a checkout; it is *not* installed as a package.
-- **Command** (from the repository root, `C:\Users\tylersec\Desktop\project\ObserverRealityEngine\`):
+- **Command** (from the repository root):
 
   ```bash
   python -m venv .venv
@@ -67,7 +65,7 @@ The engine is presented as a conceptual / educational artefact — explicitly *n
 Launched from the repo root so that `engine/` is importable:
 
 ```bash
-$ cd C:\Users\tylersec\Desktop\project\ObserverRealityEngine
+$ cd /path/to/ObserverRealityEngine
 $ python -m engine
 ```
 
@@ -132,9 +130,9 @@ The 25 tests cover: phase-transition guard rails, the five named invariants (sin
 
 ### 3.1 Known fragilities
 
-- ~~**`python examples/basic_example.py` from the repo root fails with `ModuleNotFoundError: No module named 'engine'`** even though the README documents it as a one-liner. Reason: only `tests/conftest.py` adjusts `sys.path`; the example script does not, and CPython does not put the CWD on `sys.path` when a script path is given. Workarounds: `python -m engine` (uses `__main__.py`, which fixes `sys.path`), or `PYTHONPATH=. python examples/basic_example.py`. ⚠️~~ **FIXED (2026-05-14):** `examples/basic_example.py` now prepends the repo root to `sys.path` at import time (mirroring `engine/__main__.py`), so `python examples/basic_example.py` works directly from the repo root with no `PYTHONPATH` plumbing. ✅
-- ~~**README/example label drift.** The README "Quick start" uses Greek-letter micro-state ids (`ω1`, `ω2`, `ω3`); `examples/basic_example.py` uses ASCII (`w1`, `w2`, `w3`).~~ **FIXED 2026-06-10** — the README Quick-start now uses the same ASCII ids (`w1`/`w2`/`w3`) as the example, so copy-pasting between them is safe. Greek Ω/ω remain only in the conceptual prose as math notation, never in runnable code.
-- ~~**`requirements.txt` lists no dependencies** (everything is commented out). A reader following "install requirements" gets a misleading no-op.~~ **FIXED 2026-06-10** — root `requirements.txt` now states explicitly that there are no runtime dependencies (pure stdlib) and points to `tests/requirements.txt` for the test deps.
+- `examples/basic_example.py` prepends the repo root to `sys.path` at import time (mirroring `engine/__main__.py`), so `python examples/basic_example.py` works directly from the repo root with no `PYTHONPATH` plumbing needed.
+- The README "Quick start" and `examples/basic_example.py` both use the same ASCII micro-state ids (`w1`/`w2`/`w3`), so copy-pasting between them is safe. Greek Ω/ω appear only in the conceptual prose as math notation, never in runnable code.
+- Root `requirements.txt` is intentionally empty (pure stdlib, no runtime deps) and points readers at `tests/requirements.txt` for the actual test dependency (`pytest>=7.0`).
 - **No `setup.py` / `pyproject.toml`.** The project cannot be `pip install`-ed or `pip install -e`-d; downstream consumers must vendor the `engine/` directory or set `PYTHONPATH`. ⚠️
 - **CI tests `head -40` of the example output.** On a system without `head` (native Windows `cmd.exe`), the smoke-test step would fail; CI is pinned to `ubuntu-latest`, so this is currently safe but coupled to the runner OS.
 - **No thread safety.** Documented in README "Limitations" — the phase state machine assumes single-threaded use.
@@ -149,8 +147,6 @@ The 25 tests cover: phase-transition guard rails, the five named invariants (sin
 ### 3.3 Roadmap
 
 - **Short-term (≤ 1 day)**:
-  - ~~Fix `examples/basic_example.py` to insert the repo root into `sys.path` (mirror `engine/__main__.py`) so the README command works as documented.~~ **Done 2026-05-14.** ✅
-  - Align micro-state labels between README and `examples/basic_example.py` (pick ω… or w… and use it consistently).
   - Either delete the empty `requirements.txt` and point the README at `tests/requirements.txt`, or move `pytest` into the root file.
 - **Medium-term (≤ 1 week)**:
   - Add a minimal `pyproject.toml` (PEP 621) so the engine is `pip install`-able and editable installs work; CI can then drop the `PYTHONPATH` assumption.
@@ -168,7 +164,7 @@ The 25 tests cover: phase-transition guard rails, the five named invariants (sin
 | README documents build | ✅ | "Testing" section gives `pip install -r tests/requirements.txt; python -m pytest tests/ -v`. |
 | Build files present | ⚠️ | Root `requirements.txt` now clearly states "no runtime dependencies (pure stdlib)" and points to `tests/requirements.txt` (the real test-dep manifest). Still no `setup.py`/`pyproject.toml` — the project is run in-place via `python -m engine` (documented design). |
 | Build files internally consistent | ✅ | Root `requirements.txt` (no runtime deps) and `tests/requirements.txt` (pytest) agree and no longer mislead; README Quick-start ids match the example. |
-| Source structure matches README | ✅ | `engine.{state,question,measurement_window,history,isa,core}` — every module the README's Architecture table names exists with the documented role. `python examples/basic_example.py` from the repo root now runs as the README documents (post-2026-05-14 fix). |
+| Source structure matches README | ✅ | `engine.{state,question,measurement_window,history,isa,core}` — every module the README's Architecture table names exists with the documented role. `python examples/basic_example.py` from the repo root runs as the README documents. |
 | Tests exist | ✅ | 25 tests across `test_engine.py`, `test_history.py`, `test_isa.py`, `test_state.py`; conftest patches `sys.path`. |
 | Test invocation documented | ✅ | README "Testing" + `.github/workflows/python-tests.yml` both show `python -m pytest tests/ -v`. |
 | Output artifacts named in build files | ✅ (N/A) | Pure-Python library, no compiled artefacts; the importable `engine/` package is the deliverable. CI smoke-tests the bundled example as the runnable artefact. |

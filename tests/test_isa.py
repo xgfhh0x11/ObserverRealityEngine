@@ -14,9 +14,13 @@ def test_state_def_then_load_then_store():
     isa.state_load({"a": 0.5, "b": 0.3, "c": 0.2})
     s = isa.state_manager.get_state()
     assert s.omega_global == {"a", "b", "c"}
-    isa.state_store("a")  # store a single SET id as the surviving state
-    s2 = isa.state_manager.get_state()
-    assert "a" in s2.omega_global
+    # state_store()/store_result() is deprecated and disabled: it
+    # conflates a SET identifier with a micro-state name and can
+    # silently produce a wrong post-collapse state. It now raises
+    # instead of doing that silently; store_micro_states() (used by
+    # Engine.collapse()) is the correct, real path.
+    with pytest.raises(NotImplementedError):
+        isa.state_store("a")
 
 
 def test_full_transaction_via_isa():

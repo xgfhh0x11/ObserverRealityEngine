@@ -50,7 +50,7 @@ def example_1_simple_measurement():
     
     print(f"Initial state: {engine.state_manager.get_mu()}")
     
-    # Create question: "A mi?" -> {w1} vs {w2, w3}
+    # Create question: "Is it A?" -> {w1} vs {w2, w3}
     Q_A = create_simple_question(
         "Q_A",
         {
@@ -198,7 +198,7 @@ def example_4_sequential_measurements():
     print(f"State after M1: {engine.state_manager.get_mu()}")
     print(f"Time: {len(engine.history)}\n")
     
-    # Second measurement: "B mi?" (on collapsed state)
+    # Second measurement: "Is it B?" (on collapsed state)
     Q2 = create_simple_question(
         "Q2",
         {"B": {"B"}, "notB": {"A", "C"}}
